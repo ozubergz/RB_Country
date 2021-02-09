@@ -17,9 +17,11 @@ import java.util.List;
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     private List<CountryModel> countries;
+    private CountryClickListener listener;
 
-    public Adapter(List<CountryModel> countries) {
+    public Adapter(List<CountryModel> countries, CountryClickListener listener) {
         this.countries = countries;
+        this.listener = listener;
     }
 
 
@@ -28,7 +30,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CountryLayoutBinding binding = CountryLayoutBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
-        return new ViewHolder(binding);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -44,14 +46,23 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final CountryLayoutBinding binding;
+        private CountryClickListener listener;
 
-        public ViewHolder(CountryLayoutBinding binding) {
+        public ViewHolder(CountryLayoutBinding binding, CountryClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
+            this.listener = listener;
         }
 
         public void set(CountryModel country) {
             Glide.with(this.itemView).load(country.getFlag()).into(binding.ivFlag);
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null)
+                        listener.itemClick(getPosition());
+                }
+            });
         }
 
     }
